@@ -6,6 +6,5 @@ enum Nat:
 import Nat.*
 
 def add(n: Nat, m: Nat): Nat = ???
-
 def mult(n: Nat, m: Nat): Nat = ???
 
