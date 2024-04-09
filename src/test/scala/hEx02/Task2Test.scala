@@ -5,6 +5,9 @@ import util.*
 import util.SExpParser._
 
 class Task2Test extends AnyFunSuite:
+
+// TODO: add some extra test cases for Task2 hEx02
+
   test("testSNum") {
     // as an s-expression 42
     assertResult(
