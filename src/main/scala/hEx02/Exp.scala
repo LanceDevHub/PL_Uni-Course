@@ -10,3 +10,4 @@ enum Exp:
   case Num(num: Int)
   case Plus(lhs: Exp, rhs: Exp)
   case Mult(lhs: Exp, rhs: Exp)
+
