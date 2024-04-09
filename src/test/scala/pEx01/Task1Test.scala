@@ -55,6 +55,16 @@ class Task1Test extends AnyFunSuite:
     )
   }
 
+  test("character to Roman") {
+    assertResult(
+      stringToRoman("MMM")
+    )(
+    charListToRomanLetters(
+      List('M','M','M')
+    ))
+  }
+
+
   test("Too many I's") {
     assertThrows[Exception](
       romanStringToScalaInt("MCIIII")

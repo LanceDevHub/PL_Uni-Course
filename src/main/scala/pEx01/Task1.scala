@@ -21,29 +21,43 @@ enum RomanLetter:
 import RomanLetter.*
 
 
-def romanToScalaInt(romanNumeral: Roman): Int =
-  def romanToScalaIntHelper(inputRoman: Roman, romanLetters: List[RomanScalaPair]): Int = romanLetters match
-    case Nil =>
-      if (inputRoman.nonEmpty) sys.error("Invalid input")   // not everything could be parsed
-      0
-    case currRomanIntPair :: tailRomanLetters =>
-      inputRoman match
-        case Nil => 0
-        case r1::tailInput if (r1 != currRomanIntPair.roman) => romanToScalaIntHelper(inputRoman, tailRomanLetters)
-        case D::_ | L::_ | V::_ =>    currRomanIntPair.scalaInt + romanToScalaIntHelper(inputRoman.tail,
-          romanLetters.tail.tail)  // move to C | X | I
-        case CM::_ | XC::_ | IX::_ => currRomanIntPair.scalaInt + romanToScalaIntHelper(inputRoman.tail,
-          romanLetters.tail.tail.tail.tail)  // move to XC | IX | EndOfList
-        case CD::_ | XL::_ | IV::_ => currRomanIntPair.scalaInt + romanToScalaIntHelper(inputRoman.tail,
-          romanLetters.tail.tail) // move to XC | IX | EndOfList
-        case M::M::M::_ | C::C::C::_ | X::X::X::_ | I::I::I::_ => 3*currRomanIntPair.scalaInt + romanToScalaIntHelper(inputRoman.tail.tail.tail,
-          romanLetters.tail) // move to CM | XC | IX | EndOfList
-        case M::M::_ | C::C::_ | X::X::_ | I::I::_ => 2*currRomanIntPair.scalaInt + romanToScalaIntHelper(inputRoman.tail.tail,
-          romanLetters.tail) // move to CM | XC | IX | EndOfList
-        case M::_ | C::_ | X::_ | I::_ => currRomanIntPair.scalaInt + romanToScalaIntHelper(inputRoman.tail,
-          romanLetters.tail) // move to CM | XC | IX | EndOfList
+def romanToScalaInt(romanNumeral: Roman): Int = {
+  def romanToScalaIntHelper(inputRoman: Roman, romanLetters: List[RomanScalaPair]): Int = {
+      romanLetters match
+        case Nil =>
+          if (inputRoman.nonEmpty) sys.error("wrong input.") // if we got to the end of RomanScalaPair but input not empty
+          else 0  // if we got to the end of RomanScalaPair and input is empty
 
+        // if we didnt got to the end of RomanScalaPair, we start matching inputRoman
+        case currRomPair :: tailRomPair => inputRoman match
+          case Nil => 0
+          // if the currentRomPair.roman doesnt matches the current inputRoman.head go to the next RomPair
+          case r1 :: tail if (r1 != currRomPair.roman) => romanToScalaIntHelper(inputRoman, tailRomPair)
+
+          // if the currenRomPair.roman matches the inputRoman.head
+          case M :: M :: M :: _ | C :: C :: C :: _ | X :: X :: X :: _| I :: I :: I :: _
+            => 3 * currRomPair.scalaInt + romanToScalaIntHelper(inputRoman.tail.tail.tail, tailRomPair)
+            // move to CM | XC | IX | EndOfList
+          case M :: M :: _ | C :: C :: _ | X :: X :: _| I :: I :: _
+            => 2 * currRomPair.scalaInt + romanToScalaIntHelper(inputRoman.tail.tail, tailRomPair)
+            // move to CM | XC | IX | EndOfList
+          case M :: _ | C :: _ | X :: _| I :: _
+            => currRomPair.scalaInt + romanToScalaIntHelper(inputRoman.tail, tailRomPair)
+            // move to CM | XC | IX | EndOfList
+          case CM :: _ | XC :: _ | IX :: _
+            => currRomPair.scalaInt + romanToScalaIntHelper(inputRoman.tail, tailRomPair.tail.tail.tail)
+            // move to XC | IX | EndOfList
+          case D :: _ | L :: _ | V :: _
+            => currRomPair.scalaInt + romanToScalaIntHelper(inputRoman.tail, tailRomPair.tail)
+            // move to C | X | I | EndOfList
+          case CD :: _ | XL :: _ | IV :: _
+            => currRomPair.scalaInt + romanToScalaIntHelper(inputRoman.tail, tailRomPair.tail)
+            // move to XC | IX | EndOfList
+          case _ => sys.error("wrong input given.")
+            // exception
+  }
   romanToScalaIntHelper(romanNumeral, romanLetters)
+}
 
 
 val romanLetters: List[RomanScalaPair] = List(
@@ -71,17 +85,18 @@ def charListToRomanLetters(charsOfRomanLetters: List[Char]): Roman = charsOfRoma
   case 'V' :: tail => V :: charListToRomanLetters(tail)
   case 'I' :: 'V' :: tail => IV :: charListToRomanLetters(tail)
   case 'I' :: tail => I :: charListToRomanLetters(tail)
-  case c :: tail => sys.error(s"Unknown character: $c")
+  case c => sys.error(s"unknown character: $c")
 
+def scalaIntToRoman(scalaInt: Int): Roman = {
+  def scalaIntToRomanHelper(scalaInt: Int, romanLetters: List[RomanScalaPair]): Roman = {
+    romanLetters match
+      case Nil => List() // if we got to the end of our RomanScalaPair -> end of recursion
 
-def scalaIntToRoman(scalaInt: Int): Roman =
-  def scalaIntToRomanHelper(scalaInt: Int, romanLetters: List[RomanScalaPair]): Roman = romanLetters match
-    case Nil => List()
-    case currRomanScalaPair :: tailRomanLetters =>
-      val countCurrRoman = scalaInt / currRomanScalaPair.scalaInt
-      val listOfCurrCountRomanLetters: Roman = (1 to countCurrRoman)    // creates a range from 1 to (including) countCurrRoman
-        .map(_ => currRomanScalaPair.roman).toList                      // goes through the range and converts each number to currRomanScalaPair.roman
-      val remainder: Int = scalaInt % currRomanScalaPair.scalaInt
-      listOfCurrCountRomanLetters ++ scalaIntToRomanHelper(remainder, tailRomanLetters)
-
+      case currPair :: tailPair =>
+        val currenCount = scalaInt / currPair.scalaInt
+        val listOfCurrentLetters = (1 to currenCount).map(_ => currPair.roman).toList
+        val remainder = scalaInt % currPair.scalaInt
+        listOfCurrentLetters ++ scalaIntToRomanHelper(remainder, tailPair)
+  }
   scalaIntToRomanHelper(scalaInt, romanLetters)
+}
