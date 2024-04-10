@@ -2,6 +2,8 @@ package hEx02
 
 import Exp.*
 
+import scala.annotation.tailrec
+
 enum Nat:
   case Zero()
   case Succ(n: Nat)
@@ -16,10 +18,49 @@ def mult(n: Nat, m: Nat): Nat = n match
   case Succ(n1) => add(mult(m, n1), m)
 
 // The precondition n >= 0 has to hold
-def intToPeano(n: Int): Nat = ???
+
+def intToPeano(n: Int): Nat = {
+  def intToPeanoHelper(num: Int, result: Nat = Zero()): Nat = {
+    num match
+      case 0 => result
+      case n: Int if(n >= 1) => intToPeanoHelper(n - 1, Succ(result))
+      case _ => sys.error("given number can't be converted to peano")
+
+  }
+  intToPeanoHelper(n)
+}
 
 enum Value:
   case Num(n: Nat)
   case Bool(b: Boolean)
 
-def interp(expr: Exp): Value = ???
+def interp(expr: Exp): Value = expr match
+  case True() => Value.Bool(true)
+  case False() => Value.Bool(false)
+  case Not(expr) => interp(expr) match
+    case Value.Bool(true) => Value.Bool(false)
+    case Value.Bool(false) => Value.Bool(true)
+    case e => sys.error(s"couldn't interpret given expression because of $e")
+  case And(lhs, rhs) => interp(lhs) match
+    case Value.Bool(true) => interp(rhs) match 
+      case Value.Bool(true) => Value.Bool(true)
+      case Value.Bool(false) => Value.Bool(false)
+      case e => sys.error(s"couldn't interpret given expression because of $e")
+    case Value.Bool(false) => Value.Bool(false)
+    case e => sys.error(s"couldn't interpret given expression because of $e")
+  case Or(lhs, rhs) => interp(lhs) match
+    case Value.Bool(true) => Value.Bool(true)
+    case Value.Bool(false) => interp(rhs) match
+      case Value.Bool(true) => Value.Bool(true)
+      case Value.Bool(false) => Value.Bool(false)
+      case e => sys.error(s"couldn't interpret given expression because of $e")
+    case e => sys.error(s"couldn't interpret given expression because of $e")
+
+  // TODO
+  /*
+  case If() => ???
+  case Num() = ???
+  case Plus() => ???
+  case Mult() => ???
+
+   */
