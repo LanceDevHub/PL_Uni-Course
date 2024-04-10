@@ -36,11 +36,14 @@ enum Value:
 
 def interp(expr: Exp): Value = expr match
   case True() => Value.Bool(true)
+  
   case False() => Value.Bool(false)
+  
   case Not(expr) => interp(expr) match
     case Value.Bool(true) => Value.Bool(false)
     case Value.Bool(false) => Value.Bool(true)
     case e => sys.error(s"couldn't interpret given expression because of $e")
+    
   case And(lhs, rhs) => interp(lhs) match
     case Value.Bool(true) => interp(rhs) match 
       case Value.Bool(true) => Value.Bool(true)
@@ -48,6 +51,7 @@ def interp(expr: Exp): Value = expr match
       case e => sys.error(s"couldn't interpret given expression because of $e")
     case Value.Bool(false) => Value.Bool(false)
     case e => sys.error(s"couldn't interpret given expression because of $e")
+    
   case Or(lhs, rhs) => interp(lhs) match
     case Value.Bool(true) => Value.Bool(true)
     case Value.Bool(false) => interp(rhs) match
@@ -55,12 +59,32 @@ def interp(expr: Exp): Value = expr match
       case Value.Bool(false) => Value.Bool(false)
       case e => sys.error(s"couldn't interpret given expression because of $e")
     case e => sys.error(s"couldn't interpret given expression because of $e")
+    
+  case If(cond, thenExpr, elseExpr) => interp(cond) match
+    case Value.Bool(true) => interp(thenExpr) match
+      case expr: Value => expr
+      case e => sys.error(s"couldn't interpret given expression because of $e")
+    case Value.Bool(false) => interp(elseExpr) match
+      case expr: Value => expr
+      case e => sys.error(s"couldn't interpret given expression because of $e")
+    case e => sys.error(s"couldn't interpret given expression because of $e") 
+    
+  case Num(n: Int) => Value.Num(intToPeano(n))
+  
+  case Plus(lhs, rhs) => interp(lhs) match
+    case Value.Num(nat1) => interp(rhs) match
+      case Value.Num(nat2) => Value.Num(add(nat1, nat2))
+      case e => sys.error(s"couldn't interpret given expression because of $e")
+    case e => sys.error(s"couldn't interpret given expression because of $e")
+    
+  case Mult(lhs, rhs) => interp(lhs) match
+    case Value.Num(nat1) => interp(rhs) match
+      case Value.Num(nat2) => Value.Num(mult(nat1, nat2))
+      case e => sys.error(s"couldn't interpret given expression because of $e")
+    case e => sys.error(s"couldn't interpret given expression because of $e")
 
-  // TODO
-  /*
-  case If() => ???
-  case Num() = ???
-  case Plus() => ???
-  case Mult() => ???
-
-   */
+  case e => sys.error(s"couldn't interpret given expression because of $e")
+      
+  
+  
+  
