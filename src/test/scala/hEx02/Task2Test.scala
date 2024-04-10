@@ -42,3 +42,106 @@ class Task2Test extends AnyFunSuite:
       parse(parseSExp("(* 1 2)"))
     )
   }
+
+  // self-added test-cases
+  test("testTrue") {
+    assertResult(
+      Ext.True()
+    )(
+      parse(parseSExp("true"))
+    )
+  }
+
+  test("testFalse") {
+    assertResult(
+      Ext.False()
+    )(
+     parse(parseSExp("false"))
+    )
+  }
+
+  test("testIfExpression") {
+    assertResult(
+      Ext.If(Ext.True(), Ext.Num(7), Ext.Num(3))
+    )(
+      parse(parseSExp("(if true 7 3)"))
+    )
+  }
+
+  test("testNum") {
+    assertResult(
+      Ext.Num(420)
+    )(
+      parse(parseSExp("420"))
+    )
+  }
+
+  test("testAdd") {
+    assertResult(
+      Ext.Plus(Ext.Num(7), Ext.Num(3))
+    )(
+      parse(parseSExp("(+ 7 3)"))
+    )
+  }
+
+  test("testMult") {
+    assertResult(
+      Ext.Mult(Ext.Num(3), Ext.Num(7))
+    )(
+      parse(parseSExp("(* 3 7)"))
+    )
+  }
+
+  test("testAnd") {
+    assertResult(
+      Ext.And(Ext.True(), Ext.False())
+    )(
+      parse(parseSExp("(and true false)"))
+    )
+  }
+
+  test("testOr") {
+    assertResult(
+      Ext.Or(Ext.False(), Ext.True())
+    )(
+      parse(parseSExp("(or false true)"))
+    )
+  }
+
+  test("testNot") {
+    assertResult(
+      Ext.Not(Ext.True())
+    )(
+      parse(parseSExp("(not true)"))
+    )
+  }
+
+  test("testImplication") {
+    assertResult(
+      Ext.Implication(Ext.True(), Ext.False())
+    )(
+      parse(parseSExp("(=> true false)"))
+    )
+  }
+
+  test("testBiImplication") {
+    assertResult(
+      Ext.BiImplication(Ext.True(), Ext.True())
+    )(
+      parse(parseSExp("(<=> true true)"))
+    )
+  }
+
+  test("testBigIfExpression") {
+    assertResult(
+      Ext.If(
+        Ext.BiImplication(Ext.True(), Ext.False()),
+        Ext.And(Ext.Or(Ext.True(), Ext.False()), Ext.Implication(Ext.False(), Ext.False())),
+        Ext.Or(Ext.True(), Ext.False())
+      )
+    )(
+      parse(parseSExp("(if (<=> true false) (and (or true false) (=> false false)) (or true false))"))
+    )
+  }
+
+
