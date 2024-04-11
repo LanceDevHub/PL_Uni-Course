@@ -23,12 +23,14 @@ def intToPeano(n: Int): Nat = {
   def intToPeanoHelper(num: Int, result: Nat = Zero()): Nat = {
     num match
       case 0 => result
-      case n: Int if(n >= 1) => intToPeanoHelper(n - 1, Succ(result))
+      case n: Int if (n >= 1) => intToPeanoHelper(n - 1, Succ(result))
       case _ => sys.error("given number can't be converted to peano")
-
   }
+
   intToPeanoHelper(n)
 }
+
+// easier way intToPeano -> n match case 0 => Zero() case _ => Succ(intToPeano(n-1))
 
 enum Value:
   case Num(n: Nat)
