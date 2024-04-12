@@ -160,4 +160,159 @@ class Task4Test extends AnyFunSuite:
     )
   }
 
+  // parse tests
+  test("testBigIfExpr") {
+    assertResult(
+      Ext.If(
+        Ext.BiImplication(Ext.True(), Ext.False()), Ext.Mult(Ext.Num(2), Ext.Num(3)), Ext.Plus(Ext.Num(1), Ext.Num(2))
+      )
+    )(
+      parse(parseSExp("(if (<=> true false) (* 2 3) (+ 1 2))"))
+    )
+  }
+    // parse string operations
+  test("testSimpleStrParse") {
+    assertResult(
+      Ext.Str("test123")
+    )(
+      parse(parseSExp("(str test123)"))
+    )
+  }
+
+  test("testStrEqualsParse") {
+    assertResult(
+      Ext.StrEquals(Ext.Str("hallo"), Ext.Str("hello"))
+    )(
+      parse(parseSExp("(strEquals (str hallo) (str hello))"))
+    )
+  }
+
+  test("testCharAtParse") {
+    assertResult(
+      Ext.CharAt(Ext.Str("foobar"), Ext.Num(3))
+    )(
+      parse(parseSExp("(charAt (str foobar) 3)"))
+    )
+  }
+
+  test("testHeadParse") {
+    assertResult(
+      Ext.Head(Ext.Str("hello"))
+    )(
+      parse(parseSExp("(head (str hello))"))
+    )
+  }
+
+  test("testStartsWithParse") {
+    assertResult(
+      Ext.StartsWith(Ext.Str("hello"), Ext.Str("h"))
+    )(
+      parse(parseSExp("(startsWith (str hello) (str h))"))
+    )
+  }
+
+  test("testEndsWithParse") {
+    assertResult(
+      Ext.EndsWith(Ext.Str("hello"), Ext.Str("l"))
+    )(
+      parse(parseSExp("(endsWith (str hello) (str l))"))
+    )
+  }
+
+  test("testConcatParse") {
+    assertResult(
+      Ext.Concat(Ext.Str("hello"), Ext.Str("world"))
+    )(
+      parse(parseSExp("(concat (str hello) (str world))"))
+    )
+  }
+
+  test("testLengthParse") {
+    assertResult(
+      Ext.Length(Ext.Str("hello"))
+    )(
+      parse(parseSExp("(length (str hello))"))
+    )
+  }
+
+  //  interpreter tests
+
+  test("testBigIfInterp") {
+    assertResult(
+      Value.Num(seven)
+    )(
+      runProg("(if (<=> true (and false true)) (* 3 2) (+ 3 4))")
+    )
+  }
+
+  test("testAddInterp") {
+    assertResult(
+      Value.Num(seven)
+    )(
+      runProg("(+ 4 3)")
+    )
+  }
+    // string interp
+  test("testSimpleStrInterp") {
+    assertResult(
+      Value.Str("hello")
+    )(
+      runProg("(str hello)")
+    )
+  }
+
+  test("testStrEqualsInterp") {
+    assertResult(
+      Value.Bool(true)
+    )(
+      runProg("(strEquals (str hello) (str hello))")
+    )
+  }
+
+  test("testCharAtInterp") {
+    assertResult(
+      Value.Str("o")
+    )(
+      runProg("(charAt (str hello) 5)")
+    )
+  }
+
+  test("testConcatInterp") {
+    assertResult(
+      Value.Str("helloWorld")
+    )(
+      runProg("(concat (str hello) (str World))")
+    )
+  }
+
+  test("testLengthInterp") {
+    assertResult(
+      Value.Num(five)
+    )(
+      runProg("(length (str hello))")
+    )
+  }
+
+  test("testAllTogetherInterp") {
+    assertResult(
+      Value.Num(seven)
+    )(
+      runProg("(if (endsWith (str hello) (str o)) (+ (length (str hello)) 2) (startsWith (str hello) (str h)))")
+    )
+  }
+
+  test("testAllTogetherInterp2") {
+    assertResult(
+      Value.Bool(true)
+    )(
+      runProg("(if (endsWith (str hello) (str a)) (+ (length (str hello)) 2) (startsWith (str hello) (str h)))")
+    )
+  }
+
+
+
+
+
+
+
 
