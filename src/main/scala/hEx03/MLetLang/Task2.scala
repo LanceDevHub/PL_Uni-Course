@@ -35,5 +35,13 @@ enum Exp:
   case Id(name: String)
 import Exp.*
 
-def desugar(e: Ext): Exp = ???
+def desugar(e: Ext): Exp = e match
+  case Ext.Num(n) => Num(n)
+  case Ext.Plus(lhs, rhs) => Plus(desugar(lhs), desugar(rhs))
+  case Ext.Mult(lhs, rhs) => Mult(desugar(lhs), desugar(rhs))
+  case Ext.Let(bindings, body) => bindings match
+    case Nil => desugar(body)
+    case head :: tail => head match
+      case (str, expr) => Let(str, desugar(expr), desugar(Ext.Let(tail, body)))
+  case Ext.Id(str) => Id(str)
 
