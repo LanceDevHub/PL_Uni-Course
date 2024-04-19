@@ -7,6 +7,15 @@ import util.SExpParser.*
 
 class Task2Test extends AnyFunSuite:
 
+  test("testId"){
+    assertResult(
+      Ext.Id("x")
+    )(
+      parse(parseSExp("x"))
+    )
+  }
+  
+
   test("testParseSingleLetBinding") {
     assertResult(
       Ext.Let(List(("x", Ext.Num(5))), Ext.Plus(Ext.Id("x"), Ext.Num(1)))
